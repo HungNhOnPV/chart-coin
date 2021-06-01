@@ -64,7 +64,11 @@ module.exports.createHolders = async (req, res, next) => {
       default: {
         const browser = await puppeteer.launch({
           // headless: false,
-          args: ["--start-maximized"],
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            "--start-maximized",
+          ],
           slowMo: 50,
         });
         const page = await browser.newPage();
