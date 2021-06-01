@@ -65,6 +65,7 @@ module.exports.createHolders = async (req, res, next) => {
         (async () => {
           console.log(1)
           const browser = await puppeteer.launch({
+            headless: true,
             args: [
               '--disable-gpu',
               '--disable-dev-shm-usage',
