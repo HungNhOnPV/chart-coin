@@ -67,7 +67,6 @@ module.exports.createHolders = async (req, res, next) => {
           args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
-            "--start-maximized",
           ],
           slowMo: 50,
         });
