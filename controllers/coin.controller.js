@@ -62,6 +62,7 @@ module.exports.createHolders = async (req, res, next) => {
         }
       }
       default: {
+        console.log(1)
         const browser = await puppeteer.launch({
           // headless: false,
           args: [
@@ -69,11 +70,14 @@ module.exports.createHolders = async (req, res, next) => {
           ],
           // slowMo: 50,
         });
+        console.log(2)
         const page = await browser.newPage();
+        console.log(3)
         await page.setViewport({ width: 0, height: 0 });
         await page.goto(`https://bscscan.com/token/${req.query.contractAddress}#balances`, {
           waitUntil: "domcontentloaded",
         });
+        console.log(4)
 
         const holder = "#ContentPlaceHolder1_tr_tokenHolders div div div div";
 
