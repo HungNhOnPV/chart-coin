@@ -68,7 +68,7 @@ module.exports.createHolders = async (req, res, next) => {
             headless: true,
             args: [
               '--no-sandbox'
-            ] 
+            ]
           });
 
           console.log(2)
