@@ -62,50 +62,46 @@ module.exports.createHolders = async (req, res, next) => {
         }
       }
       default: {
-        console.log(1)
-        const browser = await puppeteer.launch({
-          // headless: false,
-          args: [
-            "--no-sandbox",
-          ],
-          // slowMo: 50,
-        });
-        console.log(2)
-        const page = await browser.newPage();
-        console.log(3)
-        await page.setViewport({ width: 0, height: 0 });
-        await page.goto(`https://bscscan.com/token/${req.query.contractAddress}#balances`, {
-          waitUntil: "domcontentloaded",
-        });
-        console.log(4)
+        (async () => {
+          console.log(1)
+          const browser = await puppeteer.launch({
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+          });
 
-        const holder = "#ContentPlaceHolder1_tr_tokenHolders div div div div";
+          console.log(2)
+          const page = await browser.newPage();
+          console.log(3)
+          await page.setViewport({ width: 0, height: 0 });
+          await page.goto(`https://bscscan.com/token/${req.query.contractAddress}#balances`, {
+            waitUntil: "domcontentloaded",
+          });
+          console.log(4)
 
-        let holderTotal = await page.evaluate(async (holder) => {
-          const holderTotal = document.querySelector(holder);
+          const holder = "#ContentPlaceHolder1_tr_tokenHolders div div div div";
+          let holderTotal = await page.evaluate(async (holder) => {
+            const holderTotal = document.querySelector(holder);
 
 
-          return Number(holderTotal.innerText.split(' ')[0].replaceAll(',', ''))
-        }, holder);
-
-        const newCoin = new Coin({ contractAddress: req.query.contractAddress })
-        const newHolder = new Holder({ holderTotal })
-
-        const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-
-        if (checkContractAddress) {
-          newHolder.owner = checkContractAddress
-          await newHolder.save()
-          checkContractAddress.holders.push(newHolder._id)
-          await checkContractAddress.save()
-        } else {
-          await newCoin.save()
-          newHolder.owner = newCoin
-          await newHolder.save()
-          newCoin.holders.push(newHolder._id)
-          await newCoin.save()
-        }
-        return res.status(200).json({ massage: "Success" })
+            return Number(holderTotal.innerText.split(' ')[0].replaceAll(',', ''))
+          }, holder);
+          const newCoin = new Coin({ contractAddress: req.query.contractAddress })
+          const newHolder = new Holder({ holderTotal })
+          await browser.close();
+          const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
+          if (checkContractAddress) {
+            newHolder.owner = checkContractAddress
+            await newHolder.save()
+            checkContractAddress.holders.push(newHolder._id)
+            await checkContractAddress.save()
+          } else {
+            await newCoin.save()
+            newHolder.owner = newCoin
+            await newHolder.save()
+            newCoin.holders.push(newHolder._id)
+            await newCoin.save()
+          }
+          return res.status(200).json({ massage: "Success" })
+        })();
       }
     }
   } catch {
