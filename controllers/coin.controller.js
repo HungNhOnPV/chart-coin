@@ -65,8 +65,9 @@ module.exports.createHolders = async (req, res, next) => {
         const browser = await puppeteer.launch({
           // headless: false,
           args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
+            "--no-sandbox",
+            "--single-process",
+            "--no-zygote"
           ],
           slowMo: 50,
         });
