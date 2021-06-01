@@ -66,10 +66,8 @@ module.exports.createHolders = async (req, res, next) => {
           // headless: false,
           args: [
             "--no-sandbox",
-            "--single-process",
-            "--no-zygote"
           ],
-          slowMo: 50,
+          // slowMo: 50,
         });
         const page = await browser.newPage();
         await page.setViewport({ width: 0, height: 0 });
