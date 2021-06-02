@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema
 
-const HolderMinutesSchema = new Schema({
+const HolderMinuteSchema = new Schema({
   holderTotal: {
     type: Number
   },
@@ -15,6 +15,6 @@ const HolderMinutesSchema = new Schema({
   },
 })
 
-const HolderMinute = mongoose.model('HolderMinute', HolderMinutesSchema)
+const HolderMinute = mongoose.model('HolderMinute', HolderMinuteSchema)
 
 module.exports = HolderMinute

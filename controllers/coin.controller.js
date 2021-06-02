@@ -53,58 +53,74 @@ module.exports.createHolders = async (req, res, next) => {
 }
 
 module.exports.getHoldersDay = async (req, res, next) => {
-  const holder = await Holder.findOne({ createDate: { $gte: 1622199249845 } })
-  const newHolderDay = new HolderDay({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
-  const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-  if (checkContractAddress) {
-    await newHolderDay.save()
-    checkContractAddress.holderDay.push(newHolderDay._id)
-    await checkContractAddress.save()
-    return res.status(200).json({ massage: "Success" })
-  } else {
-    return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
+  try {
+    const holder = await Holder.findOne({ createDate: { $lte: Number(new Date().getTime()) } })
+    const newHolderDay = new HolderDay({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
+    const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
+    if (checkContractAddress) {
+      await newHolderDay.save()
+      checkContractAddress.holderDay.push(newHolderDay._id)
+      await checkContractAddress.save()
+      return res.status(200).json({ massage: "Success" })
+    } else {
+      return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
+    }
+  } catch {
+    return res.status(500).json({ massage: "Server error" })
   }
 }
 
 module.exports.getHoldersHour = async (req, res, next) => {
-  const holder = await Holder.findOne({ createDate: { $gte: new Date().getTime() } })
-  const newHolderHour = new HolderHour({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
-  const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-  if (checkContractAddress) {
-    await newHolderHour.save()
-    checkContractAddress.holderHour.push(newHolderHour._id)
-    await checkContractAddress.save()
-    return res.status(200).json({ massage: "Success" })
-  } else {
-    return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
+  try {
+    const holder = await Holder.findOne({ createDate: { $lte: new Date().getTime() } })
+    const newHolderHour = new HolderHour({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
+    const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
+    if (checkContractAddress) {
+      await newHolderHour.save()
+      checkContractAddress.holderHour.push(newHolderHour._id)
+      await checkContractAddress.save()
+      return res.status(200).json({ massage: "Success" })
+    } else {
+      return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
+    }
+  } catch {
+    return res.status(500).json({ massage: "Server error" })
   }
 }
 
 module.exports.getHoldersMinute = async (req, res, next) => {
-  const holder = await Holder.findOne({ createDate: { $gte: new Date().getTime() } })
-  const newHolderMinute = new HolderMinute({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
-  const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-  if (checkContractAddress) {
-    await newHolderMinute.save()
-    checkContractAddress.holderMinute.push(newHolderMinute._id)
-    await checkContractAddress.save()
-    return res.status(200).json({ massage: "Success" })
-  } else {
-    return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
+  try {
+    const holder = await Holder.findOne({ createDate: { $lte: new Date().getTime() } })
+    const newHolderMinute = new HolderMinute({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
+    const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
+    if (checkContractAddress) {
+      await newHolderMinute.save()
+      checkContractAddress.holderMinute.push(newHolderMinute._id)
+      await checkContractAddress.save()
+      return res.status(200).json({ massage: "Success" })
+    } else {
+      return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
+    }
+  } catch {
+    return res.status(500).json({ massage: "Server error" })
   }
 }
 
 module.exports.getHoldersWeek = async (req, res, next) => {
-  const holder = await Holder.findOne({ createDate: { $gte: new Date().getTime() } })
-  const newHolderWeek = new HolderWeek({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
-  const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-  if (checkContractAddress) {
-    await newHolderWeek.save()
-    checkContractAddress.holderWeek.push(newHolderWeek._id)
-    await checkContractAddress.save()
-    return res.status(200).json({ massage: "Success" })
-  } else {
-    return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
+  try {
+    const holder = await Holder.findOne({ createDate: { $lte: new Date().getTime() } })
+    const newHolderWeek = new HolderWeek({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
+    const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
+    if (checkContractAddress) {
+      await newHolderWeek.save()
+      checkContractAddress.holderWeek.push(newHolderWeek._id)
+      await checkContractAddress.save()
+      return res.status(200).json({ massage: "Success" })
+    } else {
+      return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
+    }
+  } catch {
+    return res.status(500).json({ massage: "Server error" })
   }
 }
 
