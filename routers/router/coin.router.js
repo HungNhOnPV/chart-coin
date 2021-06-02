@@ -2,6 +2,9 @@ const router = require('express-promise-router')()
 
 const CoinController = require('../../controllers/coin.controller')
 
+router.route('/createContractAddress')
+    .get(CoinController.createContractAddress)
+
 router.route('/holders')
     .get(CoinController.createHolders)
 

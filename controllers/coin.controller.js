@@ -6,7 +6,61 @@ const HolderHour = require('../models/HolderHour.model')
 const HolderMinute = require('../models/HolderMinute.model')
 const HolderWeek = require('../models/HolderWeek.model')
 
-module.exports.createHolders = async (req, res, next) => {
+function getPromise(contractAddress) {
+  return new Promise(async (resolve, reject) => {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox'
+      ]
+    });
+
+    const page = await browser.newPage();
+    await page.setViewport({ width: 0, height: 0 });
+    await page.goto(`https://bscscan.com/token/${contractAddress}#balances`, {
+      waitUntil: "domcontentloaded",
+    });
+
+    const holder = "#ContentPlaceHolder1_tr_tokenHolders div div div div";
+    let holderTotal = await page.evaluate(async (holder) => {
+      const holderTotal = document.querySelector(holder);
+
+
+      return Number(holderTotal.innerText.split(' ')[0].replaceAll(',', ''))
+    }, holder);
+    const newCoin = new Coin({ contractAddress })
+    const newHolder = new Holder({ holderTotal })
+    await browser.close();
+    const checkContractAddress = await Coin.findOne({ contractAddress })
+    if (checkContractAddress) {
+      newHolder.owner = checkContractAddress
+      await newHolder.save()
+      checkContractAddress.holders.push(newHolder._id)
+      await checkContractAddress.save()
+    } else {
+      await newCoin.save()
+      newHolder.owner = newCoin
+      await newHolder.save()
+      newCoin.holders.push(newHolder._id)
+      await newCoin.save()
+    }
+    resolve("Success")
+  })
+}
+
+function initLoad(contractAddress, res) {
+  const listPromise = []
+  for (let i = 0; i < contractAddress.length; i++) {
+    listPromise.push(getPromise(contractAddress[i].contractAddress))
+  }
+  Promise.all(listPromise).then(data => {
+    return res.status(200).json({ massage: "Success" })
+  }).catch(err => {
+    return res.status(500).json({ err })
+  })
+}
+
+module.exports.createContractAddress = async (req, res, next) => {
   try {
     (async () => {
       const browser = await puppeteer.launch({
@@ -21,31 +75,35 @@ module.exports.createHolders = async (req, res, next) => {
       await page.goto(`https://bscscan.com/token/${req.query.contractAddress}#balances`, {
         waitUntil: "domcontentloaded",
       });
-
       const holder = "#ContentPlaceHolder1_tr_tokenHolders div div div div";
       let holderTotal = await page.evaluate(async (holder) => {
         const holderTotal = document.querySelector(holder);
+        if (holderTotal) return 1
+        return 0
+      }, holder)
 
-
-        return Number(holderTotal.innerText.split(' ')[0].replaceAll(',', ''))
-      }, holder);
       const newCoin = new Coin({ contractAddress: req.query.contractAddress })
-      const newHolder = new Holder({ holderTotal })
-      await browser.close();
       const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-      if (checkContractAddress) {
-        newHolder.owner = checkContractAddress
-        await newHolder.save()
-        checkContractAddress.holders.push(newHolder._id)
-        await checkContractAddress.save()
+      if (!holderTotal) {
+        return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist in the coin.` })
+      } else if (checkContractAddress) {
+        return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} exist in the database.` })
       } else {
         await newCoin.save()
-        newHolder.owner = newCoin
-        await newHolder.save()
-        newCoin.holders.push(newHolder._id)
-        await newCoin.save()
       }
+
       return res.status(200).json({ massage: "Success" })
+    })();
+  } catch {
+    return res.status(500).json({ massage: "Server error" })
+  }
+}
+
+module.exports.createHolders = async (req, res, next) => {
+  try {
+    (async () => {
+      const contractAddress = await Coin.find({})
+      initLoad(contractAddress, res)
     })();
   } catch {
     return res.status(500).json({ massage: "Server error" })
