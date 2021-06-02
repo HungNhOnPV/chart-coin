@@ -8,4 +8,16 @@ router.route('/holders')
 router.route('/getHolders')
     .get(CoinController.getHolders)
 
+router.route('/holders/day')
+    .get(CoinController.getHoldersDay)
+
+router.route('/holders/hour')
+    .get(CoinController.getHoldersHour)
+
+router.route('/holders/minute')
+    .get(CoinController.getHoldersMinute)
+
+router.route('/holders/week')
+    .get(CoinController.getHoldersWeek)
+
 module.exports = router

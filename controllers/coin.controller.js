@@ -8,103 +8,103 @@ const HolderWeek = require('../models/HolderWeek.model')
 
 module.exports.createHolders = async (req, res, next) => {
   try {
-    switch (req.query.timeLine) {
-      case 'day': {
-        const holder = await Holder.findOne({ createDate: { $gte: 1622199249845 } })
-        const newHolderDay = new HolderDay({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
-        const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-        if (checkContractAddress) {
-          await newHolderDay.save()
-          checkContractAddress.holderDay.push(newHolderDay._id)
-          await checkContractAddress.save()
-          return res.status(200).json({ massage: "Success" })
-        } else {
-          return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
-        }
-      }
-      case 'hour': {
-        const holder = await Holder.findOne({ createDate: { $gte: new Date().getTime() } })
-        const newHolderHour = new HolderHour({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
-        const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-        if (checkContractAddress) {
-          await newHolderHour.save()
-          checkContractAddress.holderHour.push(newHolderHour._id)
-          await checkContractAddress.save()
-          return res.status(200).json({ massage: "Success" })
-        } else {
-          return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
-        }
-      }
-      case 'minute': {
-        const holder = await Holder.findOne({ createDate: { $gte: new Date().getTime() } })
-        const newHolderMinute = new HolderMinute({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
-        const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-        if (checkContractAddress) {
-          await newHolderMinute.save()
-          checkContractAddress.holderMinute.push(newHolderMinute._id)
-          await checkContractAddress.save()
-          return res.status(200).json({ massage: "Success" })
-        } else {
-          return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
-        }
-      }
-      case 'week': {
-        const holder = await Holder.findOne({ createDate: { $gte: new Date().getTime() } })
-        const newHolderWeek = new HolderWeek({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
-        const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-        if (checkContractAddress) {
-          await newHolderWeek.save()
-          checkContractAddress.holderWeek.push(newHolderWeek._id)
-          await checkContractAddress.save()
-          return res.status(200).json({ massage: "Success" })
-        } else {
-          return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
-        }
-      }
-      default: {
-        (async () => {
-          const browser = await puppeteer.launch({
-            headless: true,
-            args: [
-              '--no-sandbox'
-            ]
-          });
+    (async () => {
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox'
+        ]
+      });
 
-          const page = await browser.newPage();
-          await page.setViewport({ width: 0, height: 0 });
-          await page.goto(`https://bscscan.com/token/${req.query.contractAddress}#balances`, {
-            waitUntil: "domcontentloaded",
-          });
+      const page = await browser.newPage();
+      await page.setViewport({ width: 0, height: 0 });
+      await page.goto(`https://bscscan.com/token/${req.query.contractAddress}#balances`, {
+        waitUntil: "domcontentloaded",
+      });
 
-          const holder = "#ContentPlaceHolder1_tr_tokenHolders div div div div";
-          let holderTotal = await page.evaluate(async (holder) => {
-            const holderTotal = document.querySelector(holder);
+      const holder = "#ContentPlaceHolder1_tr_tokenHolders div div div div";
+      let holderTotal = await page.evaluate(async (holder) => {
+        const holderTotal = document.querySelector(holder);
 
 
-            return Number(holderTotal.innerText.split(' ')[0].replaceAll(',', ''))
-          }, holder);
-          const newCoin = new Coin({ contractAddress: req.query.contractAddress })
-          const newHolder = new Holder({ holderTotal })
-          await browser.close();
-          const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-          if (checkContractAddress) {
-            newHolder.owner = checkContractAddress
-            await newHolder.save()
-            checkContractAddress.holders.push(newHolder._id)
-            await checkContractAddress.save()
-          } else {
-            await newCoin.save()
-            newHolder.owner = newCoin
-            await newHolder.save()
-            newCoin.holders.push(newHolder._id)
-            await newCoin.save()
-          }
-          return res.status(200).json({ massage: "Success" })
-        })();
+        return Number(holderTotal.innerText.split(' ')[0].replaceAll(',', ''))
+      }, holder);
+      const newCoin = new Coin({ contractAddress: req.query.contractAddress })
+      const newHolder = new Holder({ holderTotal })
+      await browser.close();
+      const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
+      if (checkContractAddress) {
+        newHolder.owner = checkContractAddress
+        await newHolder.save()
+        checkContractAddress.holders.push(newHolder._id)
+        await checkContractAddress.save()
+      } else {
+        await newCoin.save()
+        newHolder.owner = newCoin
+        await newHolder.save()
+        newCoin.holders.push(newHolder._id)
+        await newCoin.save()
       }
-    }
+      return res.status(200).json({ massage: "Success" })
+    })();
   } catch {
     return res.status(500).json({ massage: "Server error" })
+  }
+}
+
+module.exports.getHoldersDay = async (req, res, next) => {
+  const holder = await Holder.findOne({ createDate: { $gte: 1622199249845 } })
+  const newHolderDay = new HolderDay({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
+  const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
+  if (checkContractAddress) {
+    await newHolderDay.save()
+    checkContractAddress.holderDay.push(newHolderDay._id)
+    await checkContractAddress.save()
+    return res.status(200).json({ massage: "Success" })
+  } else {
+    return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
+  }
+}
+
+module.exports.getHoldersHour = async (req, res, next) => {
+  const holder = await Holder.findOne({ createDate: { $gte: new Date().getTime() } })
+  const newHolderHour = new HolderHour({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
+  const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
+  if (checkContractAddress) {
+    await newHolderHour.save()
+    checkContractAddress.holderHour.push(newHolderHour._id)
+    await checkContractAddress.save()
+    return res.status(200).json({ massage: "Success" })
+  } else {
+    return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
+  }
+}
+
+module.exports.getHoldersMinute = async (req, res, next) => {
+  const holder = await Holder.findOne({ createDate: { $gte: new Date().getTime() } })
+  const newHolderMinute = new HolderMinute({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
+  const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
+  if (checkContractAddress) {
+    await newHolderMinute.save()
+    checkContractAddress.holderMinute.push(newHolderMinute._id)
+    await checkContractAddress.save()
+    return res.status(200).json({ massage: "Success" })
+  } else {
+    return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
+  }
+}
+
+module.exports.getHoldersWeek = async (req, res, next) => {
+  const holder = await Holder.findOne({ createDate: { $gte: new Date().getTime() } })
+  const newHolderWeek = new HolderWeek({ holderTotal: holder.holderTotal, createDate: holder.createDate, owner: holder.owner })
+  const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
+  if (checkContractAddress) {
+    await newHolderWeek.save()
+    checkContractAddress.holderWeek.push(newHolderWeek._id)
+    await checkContractAddress.save()
+    return res.status(200).json({ massage: "Success" })
+  } else {
+    return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist.` })
   }
 }
 
