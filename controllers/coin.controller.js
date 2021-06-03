@@ -93,16 +93,13 @@ module.exports.createContractAddress = async (req, res, next) => {
       } else if (checkContractAddress) {
         if (checkBrowser) {
           const isCheckAddress = checkBrowser.coin.includes(checkContractAddress._id)
-          console.log(isCheckAddress)
           if (!isCheckAddress) {
             checkContractAddress.browser.push(checkBrowser._id)
             await checkContractAddress.save()
             checkBrowser.coin.push(checkContractAddress._id)
             await checkBrowser.save()
-            console.log(1)
           }
         } else {
-          console.log(2)
           await newBrowser.save()
           checkContractAddress.browser.push(newBrowser._id)
           await checkContractAddress.save()
@@ -110,7 +107,6 @@ module.exports.createContractAddress = async (req, res, next) => {
           await newBrowser.save()
         }
       } else {
-        console.log(3)
         await newBrowser.save()
         newCoin.browser.push(newBrowser._id)
         await newCoin.save()
@@ -268,7 +264,7 @@ module.exports.getHolders = async (req, res, next) => {
 }
 
 module.exports.getFavoriteCoin = async (req, res, next) => {
-  const listFavoriteCoin = await Browser.find({ local: req.query.local })
+  const listFavoriteCoin = await Browser.findOne({ local: req.query.local })
 
   return res.status(200).json({ data: listFavoriteCoin })
 }
