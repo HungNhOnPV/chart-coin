@@ -86,20 +86,23 @@ module.exports.createContractAddress = async (req, res, next) => {
       const newCoin = new Coin({ contractAddress: req.query.contractAddress })
       const newBrowser = new Browser({ local: req.query.local })
       const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
-      const checkBrowser = await Coin.findOne({ local: req.query.local })
+      const checkBrowser = await Browser.findOne({ local: req.query.local })
 
       if (!holderTotal) {
         return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist in the coin.` })
       } else if (checkContractAddress) {
         if (checkBrowser) {
-          const isCheckAddress = checkBrowser.coin.length.includes(checkContractAddress._id)
+          const isCheckAddress = checkBrowser.coin.includes(checkContractAddress._id)
+          console.log(isCheckAddress)
           if (!isCheckAddress) {
             checkContractAddress.browser.push(checkBrowser._id)
             await checkContractAddress.save()
             checkBrowser.coin.push(checkContractAddress._id)
             await checkBrowser.save()
+            console.log(1)
           }
         } else {
+          console.log(2)
           await newBrowser.save()
           checkContractAddress.browser.push(newBrowser._id)
           await checkContractAddress.save()
@@ -107,6 +110,7 @@ module.exports.createContractAddress = async (req, res, next) => {
           await newBrowser.save()
         }
       } else {
+        console.log(3)
         await newBrowser.save()
         newCoin.browser.push(newBrowser._id)
         await newCoin.save()

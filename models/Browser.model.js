@@ -8,7 +8,7 @@ const BrowserSchema = new Schema({
   },
   coin: {
     type: Schema.Types.Array,
-    ref: "coin",
+    ref: "Coin",
   },
 })
 

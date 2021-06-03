@@ -28,7 +28,7 @@ const CoinSchema = new Schema({
   },
   browser: {
     type: Schema.Types.Array,
-    ref: "browser",
+    ref: "Browser",
   },
 })
 
