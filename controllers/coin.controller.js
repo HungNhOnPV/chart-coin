@@ -96,21 +96,21 @@ module.exports.createContractAddress = async (req, res, next) => {
           if (!isCheckAddress) {
             checkContractAddress.browser.push(checkBrowser._id)
             await checkContractAddress.save()
-            checkBrowser.coin.push(checkContractAddress._id)
+            checkBrowser.coin.push(checkContractAddress.contractAddress)
             await checkBrowser.save()
           }
         } else {
           await newBrowser.save()
           checkContractAddress.browser.push(newBrowser._id)
           await checkContractAddress.save()
-          newBrowser.coin.push(checkContractAddress._id)
+          newBrowser.coin.push(checkContractAddress.contractAddress)
           await newBrowser.save()
         }
       } else {
         await newBrowser.save()
         newCoin.browser.push(newBrowser._id)
         await newCoin.save()
-        newBrowser.coin.push(newCoin._id)
+        newBrowser.coin.push(newCoin.contractAddress)
         await newBrowser.save()
       }
 
