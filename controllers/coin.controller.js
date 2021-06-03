@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer")
 const Coin = require('../models/Coin.model')
+const Browser = require('../models/Browser.model')
 const Holder = require('../models/Holder.model')
 const HolderDay = require('../models/HolderDay.model')
 const HolderHour = require('../models/HolderHour.model')
@@ -83,13 +84,34 @@ module.exports.createContractAddress = async (req, res, next) => {
       }, holder)
 
       const newCoin = new Coin({ contractAddress: req.query.contractAddress })
+      const newBrowser = new Browser({ local: req.query.local })
       const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
+      const checkBrowser = await Coin.findOne({ local: req.query.local })
+
       if (!holderTotal) {
         return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist in the coin.` })
       } else if (checkContractAddress) {
-        return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} exist in the database.` })
+        if (checkBrowser) {
+          const isCheckAddress = checkBrowser.coin.length.includes(checkContractAddress._id)
+          if (!isCheckAddress) {
+            checkContractAddress.browser.push(checkBrowser._id)
+            await checkContractAddress.save()
+            checkBrowser.coin.push(checkContractAddress._id)
+            await checkBrowser.save()
+          }
+        } else {
+          await newBrowser.save()
+          checkContractAddress.browser.push(newBrowser._id)
+          await checkContractAddress.save()
+          newBrowser.coin.push(checkContractAddress._id)
+          await newBrowser.save()
+        }
       } else {
+        await newBrowser.save()
+        newCoin.browser.push(newBrowser._id)
         await newCoin.save()
+        newBrowser.coin.push(newCoin._id)
+        await newBrowser.save()
       }
 
       return res.status(200).json({ massage: "Success" })

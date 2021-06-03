@@ -26,6 +26,10 @@ const CoinSchema = new Schema({
     type: Schema.Types.Array,
     ref: "HolderWeek",
   },
+  browser: {
+    type: Schema.Types.Array,
+    ref: "browser",
+  },
 })
 
 const Coin = mongoose.model('Coin', CoinSchema)
