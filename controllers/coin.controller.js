@@ -262,3 +262,9 @@ module.exports.getHolders = async (req, res, next) => {
     return res.status(500).json({ massage: "Server error" })
   }
 }
+
+module.exports.getFavoriteCoin = async (req, res, next) => {
+  const listFavoriteCoin = await Browser.find({ local: req.query.local })
+
+  return res.status(200).json({ data: listFavoriteCoin })
+}

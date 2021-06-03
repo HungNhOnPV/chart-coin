@@ -26,4 +26,7 @@ router.route('/holders/minute')
 router.route('/holders/week')
     .get(CoinController.getHoldersWeek)
 
+router.route('/getFavoriteCoin')
+    .get(CoinController.getFavoriteCoin)
+
 module.exports = router
