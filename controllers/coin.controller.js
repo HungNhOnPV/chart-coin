@@ -99,6 +99,11 @@ module.exports.createContractAddress = async (req, res, next) => {
   }
 }
 
+module.exports.getContractAddress = async (req, res, next) => {
+  const contractAddress = await Coin.find({ contractAddress: new RegExp(req.query.contractAddress) }) // new RegExp(req.query.contractAddress) = /req.query.contractAddress/
+  return res.status(200).json({ data: contractAddress })
+}
+
 module.exports.createHolders = async (req, res, next) => {
   try {
     (async () => {

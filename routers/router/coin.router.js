@@ -5,6 +5,9 @@ const CoinController = require('../../controllers/coin.controller')
 router.route('/createContractAddress')
     .get(CoinController.createContractAddress)
 
+router.route('/getContractAddress')
+    .get(CoinController.getContractAddress)
+
 router.route('/holders')
     .get(CoinController.createHolders)
 
