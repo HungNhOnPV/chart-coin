@@ -127,7 +127,10 @@ module.exports.getContractAddress = async (req, res, next) => {
     method: 'get',
     url: `https://bscscan.com/searchHandler?term=${req.query.contractAddress}&filterby=0`,
     headers: {
-      'Cookie': 'ASP.NET_SessionId=5kaluzwr11kkbebzqwhyplu0; __cflb=02DiuJNoxEYARvg2sN5nZBeFpCLNsmCfEL7F8f5qDcMTS'
+      'Cookie': 'ASP.NET_SessionId=5kaluzwr11kkbebzqwhyplu0; __cflb=02DiuJNoxEYARvg2sN5nZBeFpCLNsmCfEL7F8f5qDcMTS',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token',
     }
   };
 
@@ -137,7 +140,6 @@ module.exports.getContractAddress = async (req, res, next) => {
       const data = response.data.toString().split('\t')
       for (let i = 0; i < data.length; i++) {
         if (data[i].includes('0x') && data[i].length === 42) {
-          console.log(data[i].length)
           listAddress.push(data[i])
         }
       }
