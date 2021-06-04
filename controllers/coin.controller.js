@@ -72,19 +72,15 @@ module.exports.createContractAddress = async (req, res, next) => {
       const checkBrowser = await Browser.findOne({ local: req.query.local })
 
       if (checkContractAddress) {
-        console.log(1)
         if (checkBrowser) {
-          console.log(2)
           const isCheckAddress = checkBrowser.coin.includes(checkContractAddress.contractAddress)
           if (!isCheckAddress) {
-            console.log(5)
             checkContractAddress.browser.push(checkBrowser._id)
             await checkContractAddress.save()
             checkBrowser.coin.push(checkContractAddress.contractAddress)
             await checkBrowser.save()
           }
         } else {
-          console.log(3)
           await newBrowser.save()
           checkContractAddress.browser.push(newBrowser._id)
           await checkContractAddress.save()
@@ -92,7 +88,6 @@ module.exports.createContractAddress = async (req, res, next) => {
           await newBrowser.save()
         }
       } else {
-        console.log(4)
         await newBrowser.save()
         newCoin.browser.push(newBrowser._id)
         await newCoin.save()
