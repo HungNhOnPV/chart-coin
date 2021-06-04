@@ -53,6 +53,7 @@ function getPromise(contractAddress) {
 function initLoad(contractAddress, res) {
   const listPromise = []
   for (let i = 0; i < contractAddress.length; i++) {
+    console.log(contractAddress[i].contractAddress)
     listPromise.push(getPromise(contractAddress[i].contractAddress))
   }
   Promise.all(listPromise).then(data => {
