@@ -1,3 +1,4 @@
+var axios = require('axios');
 const puppeteer = require("puppeteer")
 const Coin = require('../models/Coin.model')
 const Browser = require('../models/Browser.model')
@@ -122,8 +123,30 @@ module.exports.createContractAddress = async (req, res, next) => {
 }
 
 module.exports.getContractAddress = async (req, res, next) => {
-  const contractAddress = await Coin.find({ contractAddress: new RegExp(req.query.contractAddress) }) // new RegExp(req.query.contractAddress) = /req.query.contractAddress/
-  return res.status(200).json({ data: contractAddress })
+  var config = {
+    method: 'get',
+    url: `https://bscscan.com/searchHandler?term=${req.query.contractAddress}&filterby=0`,
+    headers: {
+      'Cookie': 'ASP.NET_SessionId=5kaluzwr11kkbebzqwhyplu0; __cflb=02DiuJNoxEYARvg2sN5nZBeFpCLNsmCfEL7F8f5qDcMTS'
+    }
+  };
+
+  return axios(config)
+    .then(function (response) {
+      let listAddress = []
+      const data = response.data.toString().split('\t')
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].includes('0x') && data[i].length === 42) {
+          console.log(data[i].length)
+          listAddress.push(data[i])
+        }
+      }
+      res.status(200).json({ data: listAddress })
+    })
+    .catch(function (error) {
+      console.log(error);
+      res.status(400).json({ data: error })
+    });
 }
 
 module.exports.createHolders = async (req, res, next) => {
