@@ -65,43 +65,26 @@ function initLoad(contractAddress, res) {
 module.exports.createContractAddress = async (req, res, next) => {
   try {
     (async () => {
-      // const browser = await puppeteer.launch({
-      //   headless: true,
-      //   args: [
-      //     '--no-sandbox'
-      //   ]
-      // });
-
-      // const page = await browser.newPage();
-      // await page.setViewport({ width: 0, height: 0 });
-      // await page.goto(`https://bscscan.com/token/${req.query.contractAddress}#balances`, {
-      //   waitUntil: "domcontentloaded",
-      // });
-      // const holder = "#ContentPlaceHolder1_tr_tokenHolders div div div div";
-      // let holderTotal = await page.evaluate(async (holder) => {
-      //   const holderTotal = document.querySelector(holder);
-      //   if (holderTotal) return 1
-      //   return 0
-      // }, holder)
 
       const newCoin = new Coin({ contractAddress: req.query.contractAddress })
       const newBrowser = new Browser({ local: req.query.local })
       const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
       const checkBrowser = await Browser.findOne({ local: req.query.local })
 
-      // if (!holderTotal) {
-      //   return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist in the coin.` })
-      // } else 
       if (checkContractAddress) {
+        console.log(1)
         if (checkBrowser) {
-          const isCheckAddress = checkBrowser.coin.includes(checkContractAddress._id)
+          console.log(2)
+          const isCheckAddress = checkBrowser.coin.includes(checkContractAddress.contractAddress)
           if (!isCheckAddress) {
+            console.log(5)
             checkContractAddress.browser.push(checkBrowser._id)
             await checkContractAddress.save()
             checkBrowser.coin.push(checkContractAddress.contractAddress)
             await checkBrowser.save()
           }
         } else {
+          console.log(3)
           await newBrowser.save()
           checkContractAddress.browser.push(newBrowser._id)
           await checkContractAddress.save()
@@ -109,6 +92,7 @@ module.exports.createContractAddress = async (req, res, next) => {
           await newBrowser.save()
         }
       } else {
+        console.log(4)
         await newBrowser.save()
         newCoin.browser.push(newBrowser._id)
         await newCoin.save()
