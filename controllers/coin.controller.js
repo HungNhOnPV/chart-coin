@@ -65,33 +65,34 @@ function initLoad(contractAddress, res) {
 module.exports.createContractAddress = async (req, res, next) => {
   try {
     (async () => {
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: [
-          '--no-sandbox'
-        ]
-      });
+      // const browser = await puppeteer.launch({
+      //   headless: true,
+      //   args: [
+      //     '--no-sandbox'
+      //   ]
+      // });
 
-      const page = await browser.newPage();
-      await page.setViewport({ width: 0, height: 0 });
-      await page.goto(`https://bscscan.com/token/${req.query.contractAddress}#balances`, {
-        waitUntil: "domcontentloaded",
-      });
-      const holder = "#ContentPlaceHolder1_tr_tokenHolders div div div div";
-      let holderTotal = await page.evaluate(async (holder) => {
-        const holderTotal = document.querySelector(holder);
-        if (holderTotal) return 1
-        return 0
-      }, holder)
+      // const page = await browser.newPage();
+      // await page.setViewport({ width: 0, height: 0 });
+      // await page.goto(`https://bscscan.com/token/${req.query.contractAddress}#balances`, {
+      //   waitUntil: "domcontentloaded",
+      // });
+      // const holder = "#ContentPlaceHolder1_tr_tokenHolders div div div div";
+      // let holderTotal = await page.evaluate(async (holder) => {
+      //   const holderTotal = document.querySelector(holder);
+      //   if (holderTotal) return 1
+      //   return 0
+      // }, holder)
 
       const newCoin = new Coin({ contractAddress: req.query.contractAddress })
       const newBrowser = new Browser({ local: req.query.local })
       const checkContractAddress = await Coin.findOne({ contractAddress: req.query.contractAddress })
       const checkBrowser = await Browser.findOne({ local: req.query.local })
 
-      if (!holderTotal) {
-        return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist in the coin.` })
-      } else if (checkContractAddress) {
+      // if (!holderTotal) {
+      //   return res.status(401).json({ massage: `Contract address ${req.query.contractAddress} not exist in the coin.` })
+      // } else 
+      if (checkContractAddress) {
         if (checkBrowser) {
           const isCheckAddress = checkBrowser.coin.includes(checkContractAddress._id)
           if (!isCheckAddress) {
